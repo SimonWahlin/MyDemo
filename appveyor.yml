@@ -45,7 +45,7 @@ deploy_script:
                     [hashtable]
                     $Path
                 )
-    
+        
                 'LicenseUri','Tags','ProjectUri','IconUri','ReleaseNotes' | Foreach {
                     if($Path['PrivateData']['PSData'][$_])
                     {
@@ -53,29 +53,29 @@ deploy_script:
                     }
                 }
                 $Path['PrivateData'].Remove('PSData')
-
+        
                 Write-Output -InputObject $Path
             }
-
+        
             $ManifestData = Get-SWModuleManifestData 'D:\git\InternetSettings\InternetSettings.psd1'
             $ManifestData['ModuleVersion'] = $Env:APPVEYOR_BUILD_VERSION
             $ManifestData['ReleaseNotes'] = @'
-[{0}]
-{1}
-
-{2}
-'@ -f $Env:APPVEYOR_BUILD_VERSION, 
+            [{0}]
+            {1}
+        
+            {2}
+        '@ -f $Env:APPVEYOR_BUILD_VERSION, 
                 (
                     $Env:APPVEYOR_REPO_COMMIT_MESSAGE,
                     $Env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -join "`n"
                 ),
                 $ManifestData['ReleaseNotes']
-
+        
             New-ModuleManifest @ManifestData -Path '.\InternetSettings.psd1'
-
+        
             if(Get-Command -Name Get-PackageProvider -ErrorAction SilentlyContinue)
             {
-    
+        
                 Get-PackageProvider -Name NuGet -ForceBootstrap
                 #Publish-Module -Name $Env:-NuGetApiKey $Env:PSGKey
             }
@@ -84,4 +84,5 @@ deploy_script:
                 'PSGallery not supported'
             }
         }
+        
         
