@@ -2,17 +2,9 @@ version: 1.0.{build}
 
 os: unstable
 
-init:
-    - ps: |
-        'Init phase'
-
 install: 
     - cinst -y pester
 #    - git clone https://github.com/PowerShell/DscResource.Tests
-
-build_script:
-    - ps: |
-        'Build script'
 
 test_script:
     - ps: |
@@ -26,14 +18,7 @@ test_script:
             throw "$($res.FailedCount) tests failed."
         }
 
-on_finish:
-    - ps: |
-        $Env:PWD = $PWD.Path
-        
-artifacts:
-    - path: $(PWD)
-
-deploy_script:
+after_test:
     - ps: |
         if($Env:APPVEYOR_REPO_BRANCH -ilike 'Release')
         {
@@ -57,7 +42,7 @@ deploy_script:
                 Write-Output -InputObject $Path
             }
         
-            $ManifestData = Get-SWModuleManifestData 'D:\git\InternetSettings\InternetSettings.psd1'
+            $ManifestData = Get-SWModuleManifestData '.\InternetSettings.psd1'
             $ManifestData['ModuleVersion'] = $Env:APPVEYOR_BUILD_VERSION
             $ManifestData['ReleaseNotes'] = @'
             [{0}]
@@ -84,5 +69,5 @@ deploy_script:
                 'PSGallery not supported'
             }
         }
-        
-        
+artifacts:
+    - path: $(PWD)
