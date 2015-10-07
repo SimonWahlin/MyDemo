@@ -2,13 +2,17 @@ version: 1.0.{build}
 
 os: unstable
 
-init: off
+init:
+    - ps: |
+        'Init phase'
 
 install: 
     - cinst -y pester
 #    - git clone https://github.com/PowerShell/DscResource.Tests
 
-build: off
+build:
+    - ps: |
+        'Buid phase'
 
 test_script:
     - ps: |
