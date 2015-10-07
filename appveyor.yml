@@ -12,15 +12,15 @@ build_script: off
  
 test_script:
   - ps: |
-	  $testResultsFile = ".\TestsResults.xml"
-	  $result = Invoke-Pester -OutputFormat NUnitXml -OutputFile $testResultsFile -PassThru
-	  
-	  # Upload Testresults to AppVeyor Build
-	  (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $testResultsFile))
-	  
-	  if ($result.FailedCount -gt 0) { 
+    $testResultsFile = ".\TestsResults.xml"
+    $result = Invoke-Pester -OutputFormat NUnitXml -OutputFile $testResultsFile -PassThru
+    
+    # Upload Testresults to AppVeyor Build
+    (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $testResultsFile))
+    
+    if ($result.FailedCount -gt 0) { 
       throw "$($res.FailedCount) tests failed."
-	  }
+    }
 
 on_finish:
   - ps: |
@@ -82,5 +82,5 @@ deploy_script:
     }
     else
     {
-    		'No deploy in branch: ' -f $Env:APPVEYOR_REPO_BRANCH
+        'No deploy in branch: ' -f $Env:APPVEYOR_REPO_BRANCH
     }
