@@ -5,79 +5,82 @@ os: unstable
 init: off
 
 install: 
-    - cinst -y pester
-#    - git clone https://github.com/PowerShell/DscResource.Tests
+  - cinst -y pester
+#  - git clone https://github.com/PowerShell/DscResource.Tests
 
-build: off
-
+build_script: off
+ 
 test_script:
-    - ps: |
-        $testResultsFile = ".\TestsResults.xml"
-        $result = Invoke-Pester -OutputFormat NUnitXml -OutputFile $testResultsFile -PassThru
-        
-        # Upload Testresults to AppVeyor Build
-        (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $testResultsFile))
-        
-        if ($result.FailedCount -gt 0) { 
-            throw "$($res.FailedCount) tests failed."
-        }
+  - ps: |
+	  $testResultsFile = ".\TestsResults.xml"
+	  $result = Invoke-Pester -OutputFormat NUnitXml -OutputFile $testResultsFile -PassThru
+	  
+	  # Upload Testresults to AppVeyor Build
+	  (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $testResultsFile))
+	  
+	  if ($result.FailedCount -gt 0) { 
+      throw "$($res.FailedCount) tests failed."
+	  }
 
 on_finish:
-    - ps: |
-        $Env:PWD = $PWD.Path
+  - ps: |
+    $Env:PWD = $PWD.Path
         
 artifacts:
-    - path: $(PWD)
+  - path: $(PWD)
 
 deploy_script:
-    - ps: |
-        if($Env:APPVEYOR_REPO_BRANCH -ilike 'Release')
+  - ps: |
+    if($Env:APPVEYOR_REPO_BRANCH -ilike 'Release')
+    {
+        Function Get-SWModuleManifestData
         {
-            Function Get-SWModuleManifestData
-            {
-                param
-                (
-                    [Microsoft.PowerShell.DesiredStateConfiguration.ArgumentToConfigurationDataTransformation()]
-                    [hashtable]
-                    $Path
-                )
-    
-                'LicenseUri','Tags','ProjectUri','IconUri','ReleaseNotes' | Foreach {
-                    if($Path['PrivateData']['PSData'][$_])
-                    {
-                        $Path[$_] = $Path['PrivateData']['PSData'][$_]
-                    }
+            param
+            (
+                [Microsoft.PowerShell.DesiredStateConfiguration.ArgumentToConfigurationDataTransformation()]
+                [hashtable]
+                $Path
+            )
+
+            'LicenseUri','Tags','ProjectUri','IconUri','ReleaseNotes' | Foreach {
+                if($Path['PrivateData']['PSData'][$_])
+                {
+                    $Path[$_] = $Path['PrivateData']['PSData'][$_]
                 }
-                $Path['PrivateData'].Remove('PSData')
-
-                Write-Output -InputObject $Path
             }
+            $Path['PrivateData'].Remove('PSData')
 
-            $ManifestData = Get-SWModuleManifestData 'D:\git\InternetSettings\InternetSettings.psd1'
-            $ManifestData['ModuleVersion'] = $Env:APPVEYOR_BUILD_VERSION
-            $ManifestData['ReleaseNotes'] = @'
-            [{0}]
-            {1}
-
-            {2}
-            '@ -f $Env:APPVEYOR_BUILD_VERSION, 
-                (
-                    $Env:APPVEYOR_REPO_COMMIT_MESSAGE,
-                    $Env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -join "`n"
-                ),
-                $ManifestData['ReleaseNotes']
-
-            New-ModuleManifest @ManifestData -Path '.\InternetSettings.psd1'
-
-            if(Get-Command -Name Get-PackageProvider -ErrorAction SilentlyContinue)
-            {
-    
-                Get-PackageProvider -Name NuGet -ForceBootstrap
-                #Publish-Module -Name $Env:-NuGetApiKey $Env:PSGKey
-            }
-            else
-            {
-                'PSGallery not supported'
-            }
+            Write-Output -InputObject $Path
         }
-        
+
+        $ManifestData = Get-SWModuleManifestData 'D:\git\InternetSettings\InternetSettings.psd1'
+        $ManifestData['ModuleVersion'] = $Env:APPVEYOR_BUILD_VERSION
+        $ManifestData['ReleaseNotes'] = @'
+        [{0}]
+        {1}
+
+        {2}
+        '@ -f $Env:APPVEYOR_BUILD_VERSION, 
+            (
+                $Env:APPVEYOR_REPO_COMMIT_MESSAGE,
+                $Env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -join "`n"
+            ),
+            $ManifestData['ReleaseNotes']
+
+        New-ModuleManifest @ManifestData -Path '.\InternetSettings.psd1'
+
+        if(Get-Command -Name Get-PackageProvider -ErrorAction SilentlyContinue)
+        {
+
+            Get-PackageProvider -Name NuGet -ForceBootstrap
+            #Publish-Module -Name $Env:-NuGetApiKey $Env:PSGKey
+        }
+        else
+        {
+            'PSGallery not supported'
+        }
+    }
+    else
+    {
+    		'No deploy in branch: ' -f $Env:APPVEYOR_REPO_BRANCH
+    }
