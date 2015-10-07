@@ -11,8 +11,7 @@ install:
 #    - git clone https://github.com/PowerShell/DscResource.Tests
 
 build:
-    - ps: |
-        'Buid phase'
+    off
 
 test_script:
     - ps: |
