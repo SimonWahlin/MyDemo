@@ -8,7 +8,7 @@ install:
     - cinst -y pester
 #    - git clone https://github.com/PowerShell/DscResource.Tests
 
-build: off
+build:
 
 test_script:
     - ps: |
