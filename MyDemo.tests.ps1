@@ -7,7 +7,7 @@
             $true | Should Be $true
         }
         It 'Fails on thirt test' {
-            $true | Should Be $true
+            $true | Should Be $false
         }
     }
 }
