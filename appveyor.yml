@@ -6,6 +6,8 @@ install:
     - cinst -y pester
 #    - git clone https://github.com/PowerShell/DscResource.Tests
 
+build_script:
+
 test_script:
     - ps: |
         $testResultsFile = ".\TestsResults.xml"
