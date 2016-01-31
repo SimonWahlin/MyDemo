@@ -1,2 +1,2 @@
-# MyDemo
-This is just some demo repository  
+## MyDemo
+This is just some demo repository
