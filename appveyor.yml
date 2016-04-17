@@ -52,8 +52,9 @@ artifacts:
 
 deploy_script:
     - ps: |
-        if($Env:APPVEYOR_REPO_BRANCH -ilike 'Release')
+        if($Env:APPVEYOR_REPO_TAG -eq 'true')
         {
+            "THIS IS A TAG!"
             Function Get-SWModuleManifestData
             {
                 param
@@ -99,7 +100,11 @@ deploy_script:
             else
             {
                 'PSGallery not supported'
-            }
+            }            
         }
+        else{
+            "Commit is not a tag, skipping deploy!"
+        }
+      
         
         
