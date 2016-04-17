@@ -16,10 +16,12 @@ build_script:
         $PSVersionTable
         '#'*50
         ''
-        ls $Env:
+        'APPVEYOR_REPO_TAG'
+        $Env:APPVEYOR_REPO_TAG
         '#'*50
         ''
-        ls $Variable:
+        'APPVEYOR_REPO_TAG_NAME'
+        $Env:APPVEYOR_REPO_TAG_NAME
         '#'*50
         ''
         Get-Module
