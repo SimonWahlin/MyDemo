@@ -23,7 +23,10 @@ build_script:
         $Env:APPVEYOR_REPO_TAG_NAME
         '#'*50
         ''
-        Get-Module
+        if($Env:APPVEYOR_REPO_TAG -eq 'true')
+        {
+            Write-Warning -Message "THIS IS A TAG!"            
+        }
             
 test_script:
     - ps: |
