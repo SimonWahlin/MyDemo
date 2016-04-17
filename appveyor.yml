@@ -13,7 +13,17 @@ install:
 build_script:
     - ps: |
         'Build script'
-
+        $PSVersionTable
+        '#'*50
+        ''
+        ls $Env:
+        '#'*50
+        ''
+        ls $Variable:
+        '#'*50
+        ''
+        Get-Module
+            
 test_script:
     - ps: |
         $testResultsFile = ".\TestsResults.xml"
