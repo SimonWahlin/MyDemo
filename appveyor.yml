@@ -25,7 +25,10 @@ build_script:
         ''
         if($Env:APPVEYOR_REPO_TAG -eq 'true')
         {
-            Write-Warning -Message "THIS IS A TAG!"            
+            "THIS IS A TAG!"            
+        }
+        else{
+            "NOT A TAG!"
         }
             
 test_script:
